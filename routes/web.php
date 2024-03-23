@@ -16,3 +16,15 @@
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
+
+
+$router->group(['prefix' => 'api/v1'], function () use ($router) {
+
+    /** @see \App\Http\Controllers\UsersController */
+    $router->get('users', 'UsersController@index');
+    $router->get('/{id}', 'UsersController@show');
+    $router->post('/', 'UsersController@store');
+    $router->put('/{id}', 'UsersController@update');
+    $router->delete('/{id}', 'UsersController@destroy');
+
+});
