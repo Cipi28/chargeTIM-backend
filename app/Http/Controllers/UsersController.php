@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Users;
 use Illuminate\Http\Request;
+use Ramsey\Uuid\Uuid;
 
 class UsersController extends Controller
 {
@@ -13,7 +15,7 @@ class UsersController extends Controller
     public function index()
     {
         dd("test!!!");
-        $users = Users::paginate($this->limit);
+        $users = User::paginate($this->limit);
 
         return response()->json([
             'status' => 'success',
@@ -32,7 +34,7 @@ class UsersController extends Controller
     // GET Method
     public function show($id)
     {
-        $users = Users::find($id);
+        $users = User::find($id);
         if(!$users) {
             return response()->json([
                 'status' => 'error',
@@ -46,19 +48,28 @@ class UsersController extends Controller
         ], 200);
     }
 
-    // PUT method
-    public function store(request $request)
+    /**
+     * Create user.
+     *
+     * @param Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function create(request $request)
     {
         // Validation
         $this->validate($request, [
             'name' => 'required',
-            'email' => 'required'
+            'email' => 'required|email|unique:users,email,NULL,id',
+            'password' => 'min:5',
         ]);
 
-        $users = new Users();
-        $users->name = $request->input('name');
-        $users->email = $request->input('email');
-        $users->save();
+        $user = new User();
+        $user->name = $request->get('name');
+        $user->email = $request->get('email');
+        $user->password = app('hash')->make($request->get('password', Uuid::uuid4()));
+        $user->save();
 
         return response()->json([
             'status' => 'success',
@@ -75,7 +86,7 @@ class UsersController extends Controller
             'email' => 'required'
         ]);
 
-        $users = Users::find($id);
+        $users = User::find($id);
         if(!$users) {
             return response()->json([
                 'status' => 'error',
@@ -95,7 +106,7 @@ class UsersController extends Controller
     // DELETE method
     public function destroy($id)
     {
-        $users = Users::find($id);
+        $users = User::find($id);
         if(!$users) {
             return response()->json([
                 'status' => 'error',

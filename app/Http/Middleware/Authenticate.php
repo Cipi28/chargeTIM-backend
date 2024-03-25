@@ -35,8 +35,18 @@ class Authenticate
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        if ($this->auth->guard($guard)->guest()) {
-            return response('Unauthorized.', 401);
+        /** @var \Tymon\JWTAuth\JWTGuard $userGuard */
+        $userGuard = $this->auth->guard($guard);
+
+        if ($userGuard->guest()) {
+            return response()->json([
+                'meta' => [
+                    'code' => '10401'
+                ],
+                'data' => [
+                    'messages' => "Need to login!"
+                ]
+            ], 401);
         }
 
         return $next($request);

@@ -19,12 +19,22 @@ $router->get('/', function () use ($router) {
 
 
 $router->group(['prefix' => 'api/v1'], function () use ($router) {
+    /** @see \App\Http\Controllers\AuthController */
+    $router->get('login', 'AuthController@login');
+//    $router->get('logout', 'AuthController@logout');
+//    $router->get('refresh', 'AuthController@refresh');
+//    $router->get('me', 'AuthController@me');
 
-    /** @see \App\Http\Controllers\UsersController */
-    $router->get('users', 'UsersController@index');
-    $router->get('/{id}', 'UsersController@show');
-    $router->post('/', 'UsersController@store');
-    $router->put('/{id}', 'UsersController@update');
-    $router->delete('/{id}', 'UsersController@destroy');
+    $router->group(['middleware' => ['auth']], function () use ($router) {
+
+        /** @see \App\Http\Controllers\UsersController */
+        $router->group(['prefix' => 'users'], function () use ($router) {
+            $router->get('/', 'UsersController@index');
+            $router->post('create', 'UsersController@create');
+            $router->get('/{id}', 'UsersController@show');
+            $router->put('/{id}', 'UsersController@update');
+            $router->delete('/{id}', 'UsersController@destroy');
+        });
+    });
 
 });
