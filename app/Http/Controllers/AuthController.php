@@ -3,9 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\LoginService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 
 class AuthController extends Controller
 {
@@ -24,7 +28,7 @@ class AuthController extends Controller
      * Get a JWT via given credentials.
      *
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
      * @throws \Illuminate\Validation\ValidationException
      */
     public function login(Request $request)
@@ -33,6 +37,7 @@ class AuthController extends Controller
             'email' => 'required|email|max:255',
             'password' => 'required',
         ]);
+        try {
 
         $credentials = request(['email', 'password']);
 
@@ -40,7 +45,21 @@ class AuthController extends Controller
             return response()->json(['error' => 'Unauthorized'], 404);
         }
 
-        return $this->respondWithToken($token);
+        /** @var User $user */
+        $user = auth()->user();
+
+        /** @var LoginService $loginService */
+        $loginService = app(LoginService::class);
+        $responseData = $loginService->generateUserStorageData($user, auth());
+        } catch (TokenExpiredException $e) {
+            return response(null, [], $e->getStatusCode());
+        } catch (TokenInvalidException $e) {
+            return response(null, [], $e->getStatusCode());
+        } catch (JWTException $e) {
+            return response(null, [], $e->getStatusCode());
+        }
+
+        return response()->json($responseData);
     }
 
     /**
