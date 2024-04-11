@@ -21,7 +21,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
     /**
@@ -51,6 +51,52 @@ class AuthController extends Controller
         /** @var LoginService $loginService */
         $loginService = app(LoginService::class);
         $responseData = $loginService->generateUserStorageData($user, auth());
+        } catch (TokenExpiredException $e) {
+            return response(null, [], $e->getStatusCode());
+        } catch (TokenInvalidException $e) {
+            return response(null, [], $e->getStatusCode());
+        } catch (JWTException $e) {
+            return response(null, [], $e->getStatusCode());
+        }
+
+        return response()->json($responseData);
+    }
+
+    /**
+     * Get a JWT via given credentials.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function register(Request $request)
+    {
+        $this->validate($request, [
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'password' => 'required',
+        ]);
+        try {
+
+            $credentials = request(['name', 'email', 'password']);
+
+            // Create a new user
+            $user = new User();
+            $user->name = $credentials['name'];
+            $user->email = $credentials['email'];
+            $user->password = app('hash')->make($credentials['password']);
+            $user->save();
+
+            if (! $token = auth()->attempt($credentials)) {
+                return response()->json(['error' => 'Unauthorized'], 404);
+            }
+
+            /** @var User $user */
+            $user = auth()->user();
+
+            /** @var LoginService $loginService */
+            $loginService = app(LoginService::class);
+            $responseData = $loginService->generateUserStorageData($user, auth());
         } catch (TokenExpiredException $e) {
             return response(null, [], $e->getStatusCode());
         } catch (TokenInvalidException $e) {

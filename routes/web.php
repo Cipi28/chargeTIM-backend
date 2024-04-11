@@ -21,6 +21,7 @@ $router->get('/', function () use ($router) {
 $router->group(['prefix' => 'api/v1'], function () use ($router) {
     /** @see \App\Http\Controllers\AuthController */
     $router->post('login', 'AuthController@login');
+    $router->post('register', 'AuthController@register');
 //    $router->get('logout', 'AuthController@logout');
 //    $router->get('refresh', 'AuthController@refresh');
 //    $router->get('me', 'AuthController@me');
