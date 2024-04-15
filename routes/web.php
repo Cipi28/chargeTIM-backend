@@ -36,6 +36,15 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
             $router->put('/{id}', 'UsersController@update');
             $router->delete('/{id}', 'UsersController@destroy');
         });
+
+        /** @see \App\Http\Controllers\CarsController */
+        $router->group(['prefix' => 'cars'], function () use ($router) {
+            $router->get('/{userId}', 'CarsController@index');
+//            $router->post('create', 'UsersController@create');
+//            $router->get('/{id}', 'UsersController@show');
+//            $router->put('/{id}', 'UsersController@update');
+//            $router->delete('/{id}', 'UsersController@destroy');
+        });
     });
 
 });
