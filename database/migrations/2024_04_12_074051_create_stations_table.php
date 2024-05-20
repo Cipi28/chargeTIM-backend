@@ -16,15 +16,22 @@ class CreateStationsTable extends Migration
         Schema::create('stations', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->integer('latitude');
-            $table->integer('longitude');
-            $table->string('address');
-            $table->dateTime('opening_time');
-            $table->dateTime('closing_time');
-            $table->boolean('is_public');
-            $table->integer('user_id');
+            $table->float('latitude');
+            $table->float('longitude');
+            $table->string('adress');
+            $table->string('public_id')->nullable();
+            $table->string('image')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('open_periods')->nullable();
+            $table->string('maps_URL')->nullable();
+            $table->string('website_URL')->nullable();
+            $table->integer('raiting')->default(0);
+            $table->integer('raiting_count')->default(0);
+            $table->boolean('is_public')->default(false);
+            $table->integer('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

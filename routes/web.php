@@ -44,6 +44,18 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
             $router->patch('/update/{id}', 'CarsController@update');
             $router->delete('/delete/{id}', 'CarsController@delete');
         });
+
+        /** @see \App\Http\Controllers\StationsController */
+        $router->group(['prefix' => 'stations'], function () use ($router) {
+            $router->post('save/', 'StationsController@index');
+        });
+
+            /** @see \App\Http\Controllers\FavouriteStationsController */
+        $router->group(['prefix' => 'favourite-stations'], function () use ($router) {
+            $router->get('/{userId}', 'FavouriteStationsController@index');
+            $router->post('/{userId}/{stationId}', 'FavouriteStationsController@create');
+            $router->delete('/{userId}/{stationId}', 'FavouriteStationsController@delete');
+        });
     });
 
 });

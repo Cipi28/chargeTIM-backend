@@ -14,7 +14,6 @@ class UsersController extends Controller
     // Index
     public function index()
     {
-        dd("test!!!");
         $users = User::paginate($this->limit);
 
         return response()->json([
