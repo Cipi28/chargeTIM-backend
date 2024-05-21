@@ -53,6 +53,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
             /** @see \App\Http\Controllers\FavouriteStationsController */
         $router->group(['prefix' => 'favourite-stations'], function () use ($router) {
             $router->get('/{userId}', 'FavouriteStationsController@index');
+            $router->get('/index/{userId}', 'FavouriteStationsController@getFavouriteStationsIndex');
             $router->post('/{userId}/{stationId}', 'FavouriteStationsController@create');
             $router->delete('/{userId}/{stationId}', 'FavouriteStationsController@delete');
         });
