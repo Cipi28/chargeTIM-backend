@@ -20,7 +20,7 @@ class CreateStationsTable extends Migration
             $table->float('longitude');
             $table->string('adress');
             $table->string('public_id')->nullable();
-            $table->string('image')->nullable();
+            $table->longText('image')->nullable();
             $table->string('phone')->nullable();
             $table->string('open_periods')->nullable();
             $table->string('maps_URL')->nullable();

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\FavouriteStations;
+use App\Models\Station;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -15,6 +16,21 @@ class FavouriteStationsController extends Controller
      * @throws \Illuminate\Validation\ValidationException
      */
     public function index(Request $request, $userId)
+    {
+        $favouritestations = FavouriteStations::where('user_id', $userId)->pluck('station_id');
+        $stations = Station::whereIn('id', $favouritestations)->get();
+
+        $response_data['data'] = $stations;
+        return response()->json($response_data);
+    }
+
+    /**
+     * @param Request $request
+     * @param null $userId
+     * @return JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function getFavouriteStationsIndex(Request $request, $userId)
     {
         $stationsId = FavouriteStations::where('user_id', $userId)->pluck('station_id');
 
