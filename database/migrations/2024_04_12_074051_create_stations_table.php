@@ -22,11 +22,11 @@ class CreateStationsTable extends Migration
             $table->string('public_id')->nullable();
             $table->longText('image')->nullable();
             $table->string('phone')->nullable();
-            $table->string('open_periods')->nullable();
+            $table->json('open_periods')->nullable();
             $table->string('maps_URL')->nullable();
             $table->string('website_URL')->nullable();
-            $table->integer('raiting')->default(0);
-            $table->integer('raiting_count')->default(0);
+            $table->float('rating')->default(0);
+            $table->integer('rating_count')->default(0);
             $table->boolean('is_public')->default(false);
             $table->integer('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users');

@@ -66,8 +66,8 @@ class FavouriteStationsController extends Controller
 
     /**
      * @param Request $request
-     * @param null $userId
-     * @param null $stationId
+     * @param integer $userId
+     * @param integer $stationId
      * @return JsonResponse
      * @throws \Illuminate\Validation\ValidationException
      */

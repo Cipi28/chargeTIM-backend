@@ -47,7 +47,8 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
 
         /** @see \App\Http\Controllers\StationsController */
         $router->group(['prefix' => 'stations'], function () use ($router) {
-            $router->post('save/', 'StationsController@index');
+            $router->post('save/', 'StationsController@create');
+            $router->get('{id}/', 'StationsController@index');
         });
 
             /** @see \App\Http\Controllers\FavouriteStationsController */
@@ -56,6 +57,16 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
             $router->get('/index/{userId}', 'FavouriteStationsController@getFavouriteStationsIndex');
             $router->post('/{userId}/{stationId}', 'FavouriteStationsController@create');
             $router->delete('/{userId}/{stationId}', 'FavouriteStationsController@delete');
+        });
+
+        /** @see \App\Http\Controllers\PlugsController */
+        $router->group(['prefix' => 'plugs'], function () use ($router) {
+            $router->get('/{stationId}', 'PlugsController@index');
+        });
+
+        /** @see \App\Http\Controllers\ReviewsController */
+        $router->group(['prefix' => 'reviews'], function () use ($router) {
+            $router->get('/{stationId}', 'ReviewsController@index');
         });
     });
 

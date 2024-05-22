@@ -16,11 +16,17 @@ class CreateReviewsTable extends Migration
         Schema::create('reviews', function (Blueprint $table) {
             $table->id();
             $table->integer('rating');
-            $table->string('comment');
-
+            $table->longText('comment')->nullable();
+            $table->string('reviewer_name')->nullable();
+            $table->longText('reviewer_photo')->nullable();
+            $table->boolean('is_public_reviewer')->default(false);
             $table->integer('station_id');
             $table->foreign('station_id')->references('id')->on('stations');
+            $table->integer('user_id')->nullable();
+            $table->foreign('user_id')->references('id')->on('stations');
+            $table->dateTime('published_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
