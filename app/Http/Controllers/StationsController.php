@@ -103,4 +103,17 @@ class StationsController extends Controller
 
         return response()->json($response_data);
     }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function getStations(Request $request, $id = null)
+    {
+        $stations = Station::all();
+
+        $response_data['data'] = $stations;
+        return response()->json($response_data);
+    }
 }
