@@ -49,6 +49,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
         $router->group(['prefix' => 'stations'], function () use ($router) {
             $router->post('save/', 'StationsController@create');
             $router->get('{id}/', 'StationsController@index');
+            $router->get('/', 'StationsController@getStations');
         });
 
             /** @see \App\Http\Controllers\FavouriteStationsController */
@@ -67,6 +68,11 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
         /** @see \App\Http\Controllers\ReviewsController */
         $router->group(['prefix' => 'reviews'], function () use ($router) {
             $router->get('/{stationId}', 'ReviewsController@index');
+        });
+
+        /** @see \App\Http\Controllers\BookingsController */
+        $router->group(['prefix' => 'bookings'], function () use ($router) {
+            $router->post('/', 'BookingsController@create');
         });
     });
 
