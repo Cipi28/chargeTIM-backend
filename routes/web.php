@@ -68,6 +68,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
         /** @see \App\Http\Controllers\ReviewsController */
         $router->group(['prefix' => 'reviews'], function () use ($router) {
             $router->get('/{stationId}', 'ReviewsController@index');
+            $router->post('/', 'ReviewsController@create');
         });
 
         /** @see \App\Http\Controllers\BookingsController */
@@ -75,6 +76,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
             $router->post('/', 'BookingsController@create');
             $router->post('/{userId}', 'BookingsController@index');
             $router->delete('/{id}', 'BookingsController@delete');
+            $router->patch('/{id}', 'BookingsController@update');
         });
     });
 

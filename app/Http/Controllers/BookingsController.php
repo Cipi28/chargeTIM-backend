@@ -75,6 +75,7 @@ class BookingsController extends Controller
         $booking->end_time = $request->endDate;
         $booking->status = $request->status;
         $booking->user_id = $request->userId;
+        $booking->is_reviewed = $request->isReviewed ?? false;
         $booking->save();
 
         $response_data['data'] = $booking;
@@ -91,6 +92,29 @@ class BookingsController extends Controller
     {
         $booking = Booking::where('id', $id)->first();
         $booking->delete();
+
+        $response_data['data'] = $booking;
+        return response()->json($response_data);
+    }
+
+    /**
+     * @param Request $request
+     * * @param null $id
+     * @return JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function update(Request $request, $id = null)
+    {
+        $booking = Booking::where('id', $id)->first();
+        $booking->car_id = $request->car_id;
+        $booking->station_id = $request->station_id;
+        $booking->plug_id = $request->plug_id;
+        $booking->start_time = $request->start_time;
+        $booking->end_time = $request->end_time;
+        $booking->status = $request->status;
+        $booking->user_id = $request->user_id;
+        $booking->is_reviewed = $request->is_reviewed ?? false;
+        $booking->save();
 
         $response_data['data'] = $booking;
         return response()->json($response_data);
