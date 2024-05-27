@@ -73,6 +73,8 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
         /** @see \App\Http\Controllers\BookingsController */
         $router->group(['prefix' => 'bookings'], function () use ($router) {
             $router->post('/', 'BookingsController@create');
+            $router->post('/{userId}', 'BookingsController@index');
+            $router->delete('/{id}', 'BookingsController@delete');
         });
     });
 
