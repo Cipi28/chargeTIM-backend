@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Booking;
 use App\Models\User;
 use App\Models\Users;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Ramsey\Uuid\Uuid;
 
@@ -30,21 +32,19 @@ class UsersController extends Controller
         ], 200);
     }
 
-    // GET Method
-    public function show($id)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function show(Request $request, $id = null)
     {
-        $users = User::find($id);
-        if(!$users) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'User not found!'
-            ], 404);
-        }
+        $user = User::where('id', $id)->first();
+        $UsersNumberOfBookings = Booking::where('user_id', $id)->count();
+        $user->bookings_number = $UsersNumberOfBookings;
 
-        return response()->json([
-            'status' => 'success',
-            'message' => $users
-        ], 200);
+        $response_data['data'] = $user;
+        return response()->json($response_data);
     }
 
     /**
@@ -76,30 +76,23 @@ class UsersController extends Controller
         ], 201);
     }
 
-    // UPDATE method
-    public function update(request $request, $id)
+    /**
+     * @param Request $request
+     * @param null $id
+     * @return JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function update(Request $request, $id = null)
     {
-        // Validation
-        $this->validate($request, [
-            'name' => 'required',
-            'email' => 'required'
-        ]);
+        $user = User::where('id', $id)->first();
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->address = $request->address;
+        $user->profile_photo = $request->profile_photo;
 
-        $users = User::find($id);
-        if(!$users) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'User not found!'
-            ], 404);
-        }
-        $users->name = $request->input('name');
-        $users->email = $request->input('email');
-        $users->save();
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'User has been successfully updated!'
-        ], 200);
+        $user->save();
+        $response_data['data'] = $user;
+        return response()->json($response_data);
     }
 
     // DELETE method
