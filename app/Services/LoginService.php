@@ -14,7 +14,7 @@ class LoginService
 
         return [
             'data' => [
-                'user' => $user->only('id', 'name'),
+                'user' => $user->only('id', 'name', 'profile_photo', 'role'),
             ],
             'meta' => [
                 'code' => '10200',

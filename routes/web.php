@@ -33,7 +33,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
             $router->get('/', 'UsersController@index');
             $router->post('create', 'UsersController@create');
             $router->get('/{id}', 'UsersController@show');
-            $router->put('/{id}', 'UsersController@update');
+            $router->patch('/{id}', 'UsersController@update');
             $router->delete('/{id}', 'UsersController@destroy');
         });
 
