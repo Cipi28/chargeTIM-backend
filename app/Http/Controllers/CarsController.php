@@ -46,7 +46,7 @@ class CarsController
 
     /**
      * @param Request $request
-     * @param null $distributionListId
+     * @param null $id
      * @return JsonResponse
      * @throws \Illuminate\Validation\ValidationException
      */

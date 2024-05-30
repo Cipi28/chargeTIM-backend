@@ -48,8 +48,11 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
         /** @see \App\Http\Controllers\StationsController */
         $router->group(['prefix' => 'stations'], function () use ($router) {
             $router->post('save/', 'StationsController@create');
+            $router->post('/', 'StationsController@addStation');
+            $router->delete('/{id}', 'StationsController@delete');
             $router->get('{id}/', 'StationsController@index');
             $router->get('/', 'StationsController@getStations');
+            $router->get('/user/{userId}', 'StationsController@getUserStations');
         });
 
             /** @see \App\Http\Controllers\FavouriteStationsController */
