@@ -8,5 +8,4 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class FavouriteStations extends Model
 {
     use SoftDeletes;
-
 }

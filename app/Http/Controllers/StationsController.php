@@ -15,13 +15,42 @@ class StationsController extends Controller
 {
     /**
      * @param Request $request
-     * * @param integer $id
+     * @param integer $id
      * @return JsonResponse
      * @throws \Illuminate\Validation\ValidationException
      */
     public function index(Request $request, $id = null)
     {
         $station = Station::where('id', $id)->first();
+
+        $response_data['data'] = $station;
+        return response()->json($response_data);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function addStation(Request $request)
+    {
+        $station = new Station();
+        $station->name = $request->name;
+        $station->website_URL = $request->websiteLink;
+        $station->price_per_hour = $request->price;
+        $station->adress = $request->address;
+        $station->phone = $request->phoneNumber ?? null;
+        $station->image = $request->image ?? null;
+        $station->maps_URL = null;
+        $station->is_public = $request->is_public ?? false;
+        $station->latitude = $request->latitude;
+        $station->longitude = $request->longitude;
+        $station->public_id = null;
+        $station->open_periods = null;
+        $station->user_id = $request->user_id;
+        $station->rating = 0;
+        $station->rating_count = 0;
+        $station->save();
 
         $response_data['data'] = $station;
         return response()->json($response_data);
@@ -55,6 +84,7 @@ class StationsController extends Controller
                 $station->rating = $newStation['rating'] ?? 0;
                 $station->rating_count = $newStation['ratingCount'] ?? 0;
                 $station->user_id = null;
+                $station->price_per_hour = null;
 
                 $station->save();
 
@@ -109,11 +139,40 @@ class StationsController extends Controller
      * @return JsonResponse
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function getStations(Request $request, $id = null)
+    public function getStations(Request $request)
     {
         $stations = Station::all();
 
         $response_data['data'] = $stations;
+        return response()->json($response_data);
+    }
+
+    /**
+     * @param Request $request
+     * @param integer $userId
+     * @return JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function getUserStations(Request $request, $userId = null)
+    {
+        $stations = Station::where('is_public', false)->where('user_id', $userId)->get();
+
+        $response_data['data'] = $stations;
+        return response()->json($response_data);
+    }
+
+    /**
+     * @param Request $request
+     * @param null $id
+     * @return JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function delete(Request $request, $id = null)
+    {
+        $car = Station::where('id', $id)->first();
+        $car->delete();
+
+        $response_data['data'] = $car;
         return response()->json($response_data);
     }
 }
