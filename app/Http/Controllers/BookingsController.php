@@ -7,6 +7,7 @@ use App\Models\Car;
 use App\Models\FavouriteStations;
 use App\Models\Plug;
 use App\Models\Station;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -19,8 +20,10 @@ class BookingsController extends Controller
      * @return JsonResponse
      * @throws \Illuminate\Validation\ValidationException
      */
+    const USER_ROLE = 0;
+    const CONTRIBUTOR_ROLE = 1;
 
-    const BOOKING_STATUS_BOOKED = 0;
+    const BOOKING_STATUS_ACTIVE = 0;
     const BOOKING_STATUS_STARTED = 1;
     const BOOKING_STATUS_ENDED = 2;
     const BOOKING_STATUS_PENDING = 3;
@@ -28,31 +31,38 @@ class BookingsController extends Controller
     public function index(Request $request, $userId = null)
     {
         $statuses = $request->statuses;
+        $role = $request->role;
         $returnedBookings = [];
 
-        foreach ($statuses as $status) {
-            $bookings = null;
-            if ($status === self::BOOKING_STATUS_BOOKED) {
-                $bookings = Booking::where('user_id', $userId)->where('status', $status)->get();
-                $returnedBookings[ self::BOOKING_STATUS_BOOKED] = $bookings;
-            } elseif ($status === self::BOOKING_STATUS_STARTED) {
-                $bookings = Booking::where('user_id', $userId)->where('status', $status)->get();
-                $returnedBookings[ self::BOOKING_STATUS_STARTED] = $bookings;
-            } elseif ($status === self::BOOKING_STATUS_ENDED) {
-                $bookings = Booking::where('user_id', $userId)->where('status', $status)->get();
-                $returnedBookings[ self::BOOKING_STATUS_ENDED] = $bookings;
-            } elseif ($status === self::BOOKING_STATUS_PENDING) {
-                $bookings = Booking::where('user_id', $userId)->where('status', $status)->get();
-                $returnedBookings[ self::BOOKING_STATUS_PENDING] = $bookings;
-            } elseif ($status === self::BOOKING_STATUS_REJECTED) {
-                $bookings = Booking::where('user_id', $userId)->where('status', $status)->get();
-                $returnedBookings[ self::BOOKING_STATUS_REJECTED] = $bookings;
-            }
+        if($role === self::USER_ROLE) {
 
-            foreach ($bookings as $booking) {
-            $booking->car_name = Car::where('id', $booking['car_id'])->first()->name;
-            $booking->station_name = Station::where('id', $booking['station_id'])->first()->name;
-            $booking->plug_type = Plug::where('id', $booking['plug_id'])->first()->type;
+            foreach ($statuses as $status) {
+                $bookings = Booking::where('user_id', $userId)->where('status', $status)->get();
+                $returnedBookings[$status] = $bookings;
+
+                foreach ($bookings as $booking) {
+                    $booking->car_name = Car::where('id', $booking['car_id'])->first()->name;
+                    $booking->station_name = Station::where('id', $booking['station_id'])->first()->name;
+                    $booking->plug_type = Plug::where('id', $booking['plug_id'])->first()->type;
+                }
+            }
+        } else {
+            foreach ($statuses as $status) {
+                $bookings = Booking::where('status', $status)->get();
+
+                $filteredBookings = $bookings->filter(function ($booking) use ($userId) {
+                    $station = Station::where('id', $booking->station_id)->first();
+                    return $station->user_id === intval($userId);
+                });
+
+                foreach ($filteredBookings as $booking) {
+                    $booking->car_name = Car::where('id', $booking['car_id'])->first()->name;
+                    $booking->station_name = Station::where('id', $booking['station_id'])->first()->name;
+                    $booking->plug_type = Plug::where('id', $booking['plug_id'])->first()->type;
+                    $booking->user_info = User::where('id', $booking['user_id'])->first();
+                }
+
+                $returnedBookings[$status] = array_values($filteredBookings->toArray());
             }
         }
 
@@ -114,6 +124,22 @@ class BookingsController extends Controller
         $booking->status = $request->status;
         $booking->user_id = $request->user_id;
         $booking->is_reviewed = $request->is_reviewed ?? false;
+        $booking->save();
+
+        $response_data['data'] = $booking;
+        return response()->json($response_data);
+    }
+
+    /**
+     * @param Request $request
+     * * @param null $id
+     * @return JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function updateStatus(Request $request, $id = null)
+    {
+        $booking = Booking::where('id', $id)->first();
+        $booking->status = $request->status;
         $booking->save();
 
         $response_data['data'] = $booking;

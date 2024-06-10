@@ -22,9 +22,6 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
     /** @see \App\Http\Controllers\AuthController */
     $router->post('login', 'AuthController@login');
     $router->post('register', 'AuthController@register');
-//    $router->get('logout', 'AuthController@logout');
-//    $router->get('refresh', 'AuthController@refresh');
-//    $router->get('me', 'AuthController@me');
 
     $router->group(['middleware' => ['auth']], function () use ($router) {
 
@@ -35,6 +32,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
             $router->get('/{id}', 'UsersController@show');
             $router->patch('/{id}', 'UsersController@update');
             $router->delete('/{id}', 'UsersController@destroy');
+            $router->post('/rateUser/{userId}', 'UsersController@rateUser');
         });
 
         /** @see \App\Http\Controllers\CarsController */
@@ -80,7 +78,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
             $router->post('/{userId}', 'BookingsController@index');
             $router->delete('/{id}', 'BookingsController@delete');
             $router->patch('/{id}', 'BookingsController@update');
+            $router->patch('/status/{id}', 'BookingsController@updateStatus');
         });
     });
-
 });
