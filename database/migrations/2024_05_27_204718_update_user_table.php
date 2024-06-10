@@ -17,7 +17,8 @@ class UpdateUserTable extends Migration
             $table->longText('profile_photo')->nullable()->default(null);
             $table->integer('role')->default(0);
             $table->string('address')->nullable()->default(null);
-            $table->integer('personal_rating')->nullable()->default(0);
+            $table->double('personal_rating')->nullable()->default(0);
+            $table->integer('personal_rating_count')->nullable()->default(0);
         });
     }
 
@@ -33,6 +34,7 @@ class UpdateUserTable extends Migration
             $table->dropColumn('role');
             $table->dropColumn('address');
             $table->dropColumn('personal_rating');
+            $table->dropColumn('personal_rating_count');
         });
     }
 }

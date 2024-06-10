@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
+use App\Models\Car;
+use App\Models\Plug;
+use App\Models\Station;
 use App\Models\User;
 use App\Models\Users;
 use Illuminate\Http\JsonResponse;
@@ -13,7 +16,6 @@ class UsersController extends Controller
 {
     protected $limit = 5;
 
-    // Index
     public function index()
     {
         $users = User::paginate($this->limit);
@@ -112,4 +114,39 @@ class UsersController extends Controller
             'message' => 'User has been successfully deleted!'
         ], 200);
     }
+
+    function truncateToTwoDecimals($number) {
+        return floor($number * 100) / 100;
+    }
+
+    /**
+     * @param Request $request
+     * @param null $userId
+     * @return JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function rateUser(Request $request, $userId)
+    {
+        $user = User::where('id', $userId)->first();
+        $userRating = $user->personal_rating;
+        $userRatingCount = $user->personal_rating_count;
+        $newRating = $request->rating;
+
+        $user->personal_rating = self::truncateToTwoDecimals(($userRating * $userRatingCount + $newRating) / ($userRatingCount + 1));
+        $user->personal_rating_count = $userRatingCount + 1;
+        $user->save();
+
+        $booking = Booking::where('id', $request->bookingId)->first();
+        $booking->is_user_rated = true;
+        $booking->save();
+
+        $booking->car_name = Car::where('id', $booking['car_id'])->first()->name;
+        $booking->station_name = Station::where('id', $booking['station_id'])->first()->name;
+        $booking->plug_type = Plug::where('id', $booking['plug_id'])->first()->type;
+        $booking->user_info = User::where('id', $booking['user_id'])->first();
+
+        $response_data['data'] = $booking;
+        return response()->json($response_data);
+    }
+
 }

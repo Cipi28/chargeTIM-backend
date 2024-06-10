@@ -10,6 +10,21 @@ use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Auth\Authorizable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
+/**
+ * Class Answer
+ * @package App\Models
+ *
+ * @property integer $id
+ * @property string $name
+ * @property string $email
+ * @property string $password
+ * @property string|null profile_photo
+ * @property string|null $address
+ * @property integer $personal_rating
+ * @property integer $role
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ */
 class User extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject
 {
     use Authenticatable, Authorizable, HasFactory;
