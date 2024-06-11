@@ -42,7 +42,7 @@ class AuthController extends Controller
         $credentials = request(['email', 'password']);
 
         if (! $token = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 404);
+            return response()->json(['error' => ["Account doesn't exist!"]], 404);
         }
 
         /** @var User $user */
@@ -72,19 +72,25 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $this->validate($request, [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'password' => 'required',
+            'name' => 'required|string|max:25',
+            'email' => 'required|email|max:25',
+            'password' => 'required|string|min:6|max:25',
+            'address' => 'string|max:30|regex:/^[a-zA-Z0-9\s,.]+$/',
+            'role' => 'required'
+        ], [
+            'address.regex' => 'The address format is invalid. It should contain only letters, numbers, spaces, and the following characters: , .'
         ]);
         try {
 
-            $credentials = request(['name', 'email', 'password']);
+            $credentials = request(['name', 'email', 'password', 'address', 'role']);
 
             // Create a new user
             $user = new User();
             $user->name = $credentials['name'];
             $user->email = $credentials['email'];
             $user->password = app('hash')->make($credentials['password']);
+            $user->address = $credentials['address'];
+            $user->role = $credentials['role'];
             $user->save();
 
             if (! $token = auth()->attempt($credentials)) {
