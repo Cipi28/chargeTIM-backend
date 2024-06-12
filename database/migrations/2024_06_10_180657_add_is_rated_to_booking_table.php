@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddPricePerHourToStationsTable extends Migration
+class AddIsRatedToBookingTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddPricePerHourToStationsTable extends Migration
      */
     public function up()
     {
-        Schema::table('stations', function (Blueprint $table) {
-            $table->integer('price_per_hour')->nullable()->default(null);
+        Schema::table('bookings', function (Blueprint $table) {
+            $table->boolean('is_user_rated')->default(false);
         });
     }
 
@@ -25,8 +25,8 @@ class AddPricePerHourToStationsTable extends Migration
      */
     public function down()
     {
-        Schema::table('stations', function (Blueprint $table) {
-            $table->dropColumn('price_per_hour');
+        Schema::table('bookings', function (Blueprint $table) {
+            $table->dropColumn('is_user_rated');
         });
     }
 }
