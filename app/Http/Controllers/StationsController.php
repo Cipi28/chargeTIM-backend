@@ -13,6 +13,17 @@ use Ramsey\Uuid\Uuid;
 
 class StationsController extends Controller
 {
+    const BOOKING_TYPES = [
+    'EV_CONNECTOR_TYPE_TYPE_1',
+    'EV_CONNECTOR_TYPE_TYPE_2',
+    'EV_CONNECTOR_TYPE_CCS_COMBO_1',
+    'EV_CONNECTOR_TYPE_CCS_COMBO_2',
+    'EV_CONNECTOR_TYPE_CHADEMO',
+    'EV_CONNECTOR_TYPE_GB/T',
+    'EV_CONNECTOR_TYPE_TESLA',
+];
+
+
     /**
      * @param Request $request
      * @param integer $id
@@ -37,7 +48,6 @@ class StationsController extends Controller
         $station = new Station();
         $station->name = $request->name;
         $station->website_URL = $request->websiteLink;
-        $station->price_per_hour = $request->price;
         $station->adress = $request->address;
         $station->phone = $request->phoneNumber ?? null;
         $station->image = $request->image ?? null;
@@ -46,11 +56,22 @@ class StationsController extends Controller
         $station->latitude = $request->latitude;
         $station->longitude = $request->longitude;
         $station->public_id = null;
-        $station->open_periods = null;
+        $station->open_periods = $request->open_periods;
         $station->user_id = $request->user_id;
         $station->rating = 0;
         $station->rating_count = 0;
         $station->save();
+
+
+        $plug = new Plug();
+
+        $plug->station_id = $station->id;
+        $plug->type = $request->stationPlug["plugType"];
+        $plug->kw_power = $request->stationPlug["kwPower"];
+        $plug->cost_per_kw = $request->stationPlug["costPerKw"];
+        $plug->status = $request->stationPlug["status"];
+
+        $plug->save();
 
         $response_data['data'] = $station;
         return response()->json($response_data);
@@ -93,7 +114,7 @@ class StationsController extends Controller
                         $plug = new Plug();
 
                         $plug->station_id = $station->id;
-                        $plug->type = $newPlug['type'];
+                        $plug->type = array_search($newPlug['type'], self::BOOKING_TYPES);
                         $plug->kw_power = $newPlug['kwPower'];
                         $plug->cost_per_kw = $newPlug['costPerKw'];
                         $plug->status = $newPlug['status'];
@@ -169,6 +190,11 @@ class StationsController extends Controller
      */
     public function delete(Request $request, $id = null)
     {
+        $plugs = Plug::where('station_id', $id)->get();
+        foreach ($plugs as $plug) {
+            $plug->delete();
+        }
+
         $car = Station::where('id', $id)->first();
         $car->delete();
 

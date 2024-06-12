@@ -15,7 +15,7 @@ class CreatePlugsTable extends Migration
     {
         Schema::create('plugs', function (Blueprint $table) {
             $table->id();
-            $table->string('type');
+            $table->integer('type');
             $table->integer('status');
             $table->float('kw_power');
             $table->float('cost_per_kw');
