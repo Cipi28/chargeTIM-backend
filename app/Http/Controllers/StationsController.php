@@ -105,7 +105,6 @@ class StationsController extends Controller
                 $station->rating = $newStation['rating'] ?? 0;
                 $station->rating_count = $newStation['ratingCount'] ?? 0;
                 $station->user_id = null;
-                $station->price_per_hour = null;
 
                 $station->save();
 
@@ -147,6 +146,9 @@ class StationsController extends Controller
             $station->longitude = floatval($station->longitude);
             $station->rating = floatval($station->rating);
             $station->rating_count = intval($station->rating_count);
+
+            //for every station add a list with all the plug types their plugs have
+            $station->plug_types = Plug::where('station_id', $station->id)->get()->pluck('type')->unique()->values()->all();
             return $station;
         });
 

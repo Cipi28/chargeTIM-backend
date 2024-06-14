@@ -64,6 +64,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
         /** @see \App\Http\Controllers\PlugsController */
         $router->group(['prefix' => 'plugs'], function () use ($router) {
             $router->get('/{stationId}', 'PlugsController@index');
+            $router->get('/{stationId}/{carPlugType}', 'PlugsController@getPlugsByCarPlugType');
         });
 
         /** @see \App\Http\Controllers\ReviewsController */
@@ -74,6 +75,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
 
         /** @see \App\Http\Controllers\BookingsController */
         $router->group(['prefix' => 'bookings'], function () use ($router) {
+            $router->post('/verify', 'BookingsController@verify');
             $router->post('/', 'BookingsController@create');
             $router->post('/{userId}', 'BookingsController@index');
             $router->delete('/{id}', 'BookingsController@delete');

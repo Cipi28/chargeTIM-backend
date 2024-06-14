@@ -75,6 +75,42 @@ class BookingsController extends Controller
      * @return JsonResponse
      * @throws \Illuminate\Validation\ValidationException
      */
+    public function verify(Request $request)
+    {
+        $newStartDateRaw = new \DateTime($request->startDate);
+        $newStartDate = $newStartDateRaw->format('Y-m-d H:i:s');
+        $newEndDateRaw = new \DateTime($request->endDate);
+        $newEndDate = $newEndDateRaw->format('Y-m-d H:i:s');
+
+        $bookings = Booking::where('plug_id', $request->plugId)->get()->unique();
+        $conflictingBookings = [];
+        foreach ($bookings as $booking) {
+            $bookingStartDate = new \DateTime($booking->start_time);
+            if ($booking->start_time <= $newStartDate && $booking->end_time >= $newStartDate) {
+                $conflictingBookings[] = $booking;
+                continue;
+            }
+            if ($booking->start_time <= $newEndDate && $booking->end_time >= $newEndDate) {
+                $conflictingBookings[] = $booking;
+                continue;
+            }
+            if ($booking->start_time >= $newStartDate && $booking->end_time <= $newEndDate) {
+                $conflictingBookings[] = $booking;
+            }
+        }
+
+        $response_data['data'] = $conflictingBookings;
+        return response()->json($response_data);
+
+    }
+
+
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
+     */
     public function create(Request $request)
     {
         $booking = new Booking();
