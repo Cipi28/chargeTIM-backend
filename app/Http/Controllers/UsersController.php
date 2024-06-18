@@ -86,6 +86,12 @@ class UsersController extends Controller
      */
     public function update(Request $request, $id = null)
     {
+        $this->validate($request, [
+            'name' => 'required|string|min:4|max:25',
+            'email' => 'required|email|max:25|unique:users,email,' . $id . ',id',
+            'address' => 'string|max:30|regex:/^[a-zA-Z0-9\s,.]+$/',
+        ]);
+
         $user = User::where('id', $id)->first();
         $user->name = $request->name;
         $user->email = $request->email;
