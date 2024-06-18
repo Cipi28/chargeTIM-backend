@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\FavouriteStations;
 use App\Models\Plug;
 use App\Models\Review;
 use App\Models\Station;
+use App\Models\User;
 use App\Models\Users;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Ramsey\Uuid\Uuid;
 
 class StationsController extends Controller
 {
@@ -149,6 +148,12 @@ class StationsController extends Controller
 
             //for every station add a list with all the plug types their plugs have
             $station->plug_types = Plug::where('station_id', $station->id)->get()->pluck('type')->unique()->values()->all();
+
+            if(!$station->is_public) {
+                $owner = User::where('id', $station->user_id)->first();
+                $station->owner_name = $owner->name ?? null;
+                $station->owner_mail = $owner->email ?? null;
+            }
             return $station;
         });
 
@@ -165,6 +170,14 @@ class StationsController extends Controller
     public function getStations(Request $request)
     {
         $stations = Station::all();
+
+        foreach ($stations as $station) {
+            if(!$station->is_public) {
+                $owner = User::where('id', $station->user_id)->first();
+                $station->owner_name = $owner->name ?? null;
+                $station->owner_mail = $owner->email ?? null;
+            }
+        }
 
         $response_data['data'] = $stations;
         return response()->json($response_data);

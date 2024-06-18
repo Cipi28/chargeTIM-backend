@@ -30,9 +30,35 @@ class BookingsController extends Controller
     const BOOKING_STATUS_REJECTED = 4;
     public function index(Request $request, $userId = null)
     {
+        date_default_timezone_set('Europe/Bucharest');
+
         $statuses = $request->statuses;
         $role = $request->role;
         $returnedBookings = [];
+
+        $allBookings = Booking::all();
+
+        foreach ($allBookings as $booking) {
+
+            if($booking->status === self::BOOKING_STATUS_ACTIVE) {
+                if($booking->start_time <= date('Y-m-d H:i:s')) {
+                    if($booking->end_time > date('Y-m-d H:i:s')) {
+                        $booking->status = self::BOOKING_STATUS_STARTED;
+                    } else {
+                        $booking->status = self::BOOKING_STATUS_ENDED;
+                    }
+                    $booking->save();
+                }
+            }
+
+            if($booking->status === self::BOOKING_STATUS_STARTED) {
+                if($booking->end_time <= date('Y-m-d H:i:s')) {
+                    $booking->status = self::BOOKING_STATUS_ENDED;
+                    $booking->save();
+                }
+            }
+        }
+
 
         if($role === self::USER_ROLE) {
 
