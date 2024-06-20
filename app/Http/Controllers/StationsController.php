@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Booking;
 use App\Models\Plug;
 use App\Models\Review;
 use App\Models\Station;
@@ -9,6 +10,7 @@ use App\Models\User;
 use App\Models\Users;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use DateTime;
 
 class StationsController extends Controller
 {
@@ -214,6 +216,124 @@ class StationsController extends Controller
         $car->delete();
 
         $response_data['data'] = $car;
+        return response()->json($response_data);
+    }
+
+    /**
+     * @param Request $request
+     * @param integer $userId
+     * @return JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function getChartsData(Request $request, $userId = null)
+    {
+        $chartsData = [];
+        $userStations = Station::where('is_public', false)->where('user_id', $userId)->get();
+
+
+        //PIE CHART
+        //get all bookings for the user's stations
+        $bookings = [];
+        foreach ($userStations as $station) {
+            $stationBookings = Booking::where('station_id', $station->id)->get();
+            $bookings = array_merge($bookings, $stationBookings->toArray());
+        }
+        //mane an array with the number of bookings for each station
+        $bookingsPerStation = [];
+        foreach ($bookings as $booking) {
+            if(array_key_exists($booking['station_id'], $bookingsPerStation)) {
+                $bookingsPerStation[$booking['station_id']]++;
+            } else {
+                $bookingsPerStation[$booking['station_id']] = 1;
+            }
+        }
+        //make percentage values for the bookings
+        $dataPercentage = [];
+        $totalBookings = count($bookings);
+        foreach ($bookingsPerStation as $key => $value) {
+            $dataPercentage[] = (double)number_format(($value / $totalBookings) * 100, 2);
+        }
+        $pieChartData = [];
+
+        $pieChartData['data'] = $dataPercentage;
+        $pieChartData['stationNames'] = $userStations->pluck('name')->toArray();
+        $pieChartData['totalBookings'] = $totalBookings;
+
+
+        //BAR CHART
+        //get an array of all 7 timestamps of the days og the current week
+        $days = [];
+        $today = strtotime('today');
+
+        // Find the start of the current week (Monday)
+        $startOfWeek = strtotime('last Monday', $today);
+        if (date('l', $today) == 'Monday') {
+            $startOfWeek = $today; // If today is Monday, set the start of the week to today
+        }
+
+        // Loop through the current week and add each day to the array
+        for ($i = 0; $i < 7; $i++) {
+            $days[] = date('Y-m-d', strtotime("+$i day", $startOfWeek));
+        }
+        $numberOfBookingsPerDay = [];
+        foreach ($days as $day) {
+            $bookings = Booking::where('start_time', '>=', $day . ' 00:00:00')->where('end_time', '<=', $day . ' 23:59:59')->whereIn('station_id', $userStations->pluck('id'))->get();
+            $numberOfBookingsPerDay[] = count($bookings);
+        }
+
+        $barChartData = [];
+        $barChartData['data'] = $numberOfBookingsPerDay;
+        $barChartData['days'] = $days[0] . ' - ' . $days[6];
+        $barChartData['totalWeekBookings'] = array_sum($numberOfBookingsPerDay);
+
+
+        //LINE CHART
+        $lineChartData = [];
+        $months = [];
+        $year = date('Y'); // Get the current year
+        $totalBookings = 0;
+
+        // Loop through each month of the current year
+        for ($i = 1; $i <= 12; $i++) {
+            $months[] = date('Y-m', strtotime("$year-$i-01"));
+        }
+        foreach ($userStations as $station) {
+            foreach ($months as $month) {
+                // Get the first day of the month
+                $firstDay = "$month-01";
+                // Create a DateTime object and find the last day of the month
+                $date = new DateTime($firstDay);
+                $lastDay = $date->format('Y-m-t'); // 'Y-m-t' gives the last day of the month
+
+                // Fetch bookings for the station in the given month
+                $bookings = Booking::where('station_id', $station->id)
+                    ->where('start_time', '>=', "$firstDay 00:00:00")
+                    ->where('end_time', '<=', "$lastDay 23:59:59")
+                    ->get();
+
+                // Count the bookings and add to the line chart data
+                $lineChartData[$station->name][] = count($bookings);
+                $totalBookings += count($bookings);
+            }
+        }
+
+        $lineChartDataComplete = [];
+
+        foreach ($lineChartData as $key => $value) {
+            $lineChartDataComplete[] = [
+                'name' => $key,
+                'data' => $value
+            ];
+        }
+        $lineChartDataOutput = [];
+        $lineChartDataOutput['data'] = $lineChartDataComplete;
+        $lineChartDataOutput['totalBookings'] = $totalBookings;
+
+        $chartsData['pieChartData'] = $pieChartData;
+        $chartsData['barChartData'] = $barChartData;
+        $chartsData['lineChartData'] = $lineChartDataOutput;
+
+        $response_data['data'] = $chartsData;
         return response()->json($response_data);
     }
 }

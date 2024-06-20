@@ -51,6 +51,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
             $router->get('{id}/', 'StationsController@index');
             $router->get('/', 'StationsController@getStations');
             $router->get('/user/{userId}', 'StationsController@getUserStations');
+            $router->get('/chartsData/{userId}', 'StationsController@getChartsData');
         });
 
             /** @see \App\Http\Controllers\FavouriteStationsController */
