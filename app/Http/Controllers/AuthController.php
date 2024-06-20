@@ -73,8 +73,8 @@ class AuthController extends Controller
     {
         $this->validate($request, [
             'name' => 'required|string|min:4|max:25',
-            'email' => 'required|email|max:25',
-            'password' => 'required|string|min:6|max:25',
+            'email' => 'required|email|max:50',
+            'password' => 'required|string|min:6|max:35',
             'address' => 'string|max:30|regex:/^[a-zA-Z0-9\s,.]+$/',
             'role' => 'required'
         ], [
