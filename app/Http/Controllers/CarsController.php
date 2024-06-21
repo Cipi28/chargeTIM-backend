@@ -16,7 +16,7 @@ class CarsController extends Controller
      */
     public function index(Request $request, $userId = null)
     {
-        $cars = Car::where('user_id', $userId)->orderBy('created_at', 'desc')->get();
+        $cars = Car::where('user_id', $userId)->orderBy('created_at', 'desc')->orderBy('created_at', 'desc')->get();
 
         $response_data['data'] = $cars;
 

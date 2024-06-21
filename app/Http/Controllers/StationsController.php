@@ -46,6 +46,16 @@ class StationsController extends Controller
      */
     public function addStation(Request $request)
     {
+        $this->validate($request, [
+            'name' => 'required|min:4|max:25',
+            'address' => 'required|min:4|max:50',
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
+            'open_periods' => 'required',
+            'phone_number' => 'numeric',
+            'website_link' => 'url',
+        ]);
+
         $station = new Station();
         $station->name = $request->name;
         $station->website_URL = $request->websiteLink;
@@ -68,8 +78,8 @@ class StationsController extends Controller
 
         $plug->station_id = $station->id;
         $plug->type = $request->stationPlug["plugType"];
-        $plug->kw_power = $request->stationPlug["kwPower"];
-        $plug->cost_per_kw = $request->stationPlug["costPerKw"];
+        $plug->kw_power = $request->stationPlug["kwPower"] ?? 20;
+        $plug->cost_per_kw = $request->stationPlug["costPerKw"] ?? 0;
         $plug->status = $request->stationPlug["status"];
 
         $plug->save();
@@ -193,7 +203,7 @@ class StationsController extends Controller
      */
     public function getUserStations(Request $request, $userId = null)
     {
-        $stations = Station::where('is_public', false)->where('user_id', $userId)->get();
+        $stations = Station::where('is_public', false)->where('user_id', $userId)->orderBy('created_at', 'desc')->get();
 
         $response_data['data'] = $stations;
         return response()->json($response_data);
@@ -235,7 +245,7 @@ class StationsController extends Controller
         //get all bookings for the user's stations
         $bookings = [];
         foreach ($userStations as $station) {
-            $stationBookings = Booking::where('station_id', $station->id)->get();
+            $stationBookings = Booking::where('station_id', $station->id)->whereIn('status', [0, 1, 2])->get();
             $bookings = array_merge($bookings, $stationBookings->toArray());
         }
         //mane an array with the number of bookings for each station
@@ -277,7 +287,7 @@ class StationsController extends Controller
         }
         $numberOfBookingsPerDay = [];
         foreach ($days as $day) {
-            $bookings = Booking::where('start_time', '>=', $day . ' 00:00:00')->where('end_time', '<=', $day . ' 23:59:59')->whereIn('station_id', $userStations->pluck('id'))->get();
+            $bookings = Booking::where('start_time', '>=', $day . ' 00:00:00')->where('end_time', '<=', $day . ' 23:59:59')->whereIn('station_id', $userStations->pluck('id'))->whereIn('status', [0, 1, 2])->get();
             $numberOfBookingsPerDay[] = count($bookings);
         }
 
@@ -309,6 +319,7 @@ class StationsController extends Controller
                 $bookings = Booking::where('station_id', $station->id)
                     ->where('start_time', '>=', "$firstDay 00:00:00")
                     ->where('end_time', '<=', "$lastDay 23:59:59")
+                    ->whereIn('status', [0, 1, 2])
                     ->get();
 
                 // Count the bookings and add to the line chart data
