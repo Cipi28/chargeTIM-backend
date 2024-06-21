@@ -36,7 +36,7 @@ class BookingsController extends Controller
         $role = $request->role;
         $returnedBookings = [];
 
-        $allBookings = Booking::all();
+        $allBookings = Booking::orderBy('created_at', 'desc')->get();
 
         foreach ($allBookings as $booking) {
 
@@ -54,6 +54,13 @@ class BookingsController extends Controller
             if($booking->status === self::BOOKING_STATUS_STARTED) {
                 if($booking->end_time <= date('Y-m-d H:i:s')) {
                     $booking->status = self::BOOKING_STATUS_ENDED;
+                    $booking->save();
+                }
+            }
+
+            if($booking->status === self::BOOKING_STATUS_PENDING) {
+                if($booking->start_time <= date('Y-m-d H:i:s')) {
+                    $booking->status = self::BOOKING_STATUS_REJECTED;
                     $booking->save();
                 }
             }

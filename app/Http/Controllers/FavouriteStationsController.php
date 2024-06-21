@@ -20,7 +20,7 @@ class FavouriteStationsController extends Controller
     public function index(Request $request, $userId)
     {
         $favouritestations = FavouriteStations::where('user_id', $userId)->pluck('station_id');
-        $stations = Station::whereIn('id', $favouritestations)->get();
+        $stations = Station::whereIn('id', $favouritestations)->orderBy('created_at', 'desc')->get();
 
         $stations->transform(function($station) {
 

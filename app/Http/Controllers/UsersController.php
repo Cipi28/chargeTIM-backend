@@ -43,7 +43,11 @@ class UsersController extends Controller
     {
         $user = User::where('id', $id)->first();
         $UsersNumberOfBookings = Booking::where('user_id', $id)->count();
-        $user->bookings_number = $UsersNumberOfBookings;
+
+        $userStations = Station::where('user_id', $id)->get();
+        $numberOdBookingsAtUsersStations = Booking::whereIn('station_id', $userStations->pluck('id'))->whereIn('status', [0, 1, 2])->count();
+
+        $user->bookings_number = $user->role ? $numberOdBookingsAtUsersStations : $UsersNumberOfBookings;
 
         $response_data['data'] = $user;
         return response()->json($response_data);
