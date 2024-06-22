@@ -93,7 +93,7 @@ class UsersController extends Controller
         $this->validate($request, [
             'name' => 'required|string|min:4|max:25',
             'email' => 'required|email|max:25|unique:users,email,' . $id . ',id',
-            'address' => 'string|max:30|regex:/^[a-zA-Z0-9\s,.]+$/',
+            'address' => 'string|max:50',
         ]);
 
         $user = User::where('id', $id)->first();

@@ -20,7 +20,8 @@ class CreatePlugsTable extends Migration
             $table->float('kw_power');
             $table->float('cost_per_kw');
             $table->integer('station_id');
-            $table->foreign('station_id')->references('id')->on('stations');
+            $table->foreign('station_id')->references('id')->on('stations')->onDelete('cascade');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Plug;
-use App\Models\Station;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

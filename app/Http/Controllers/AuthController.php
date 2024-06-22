@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Services\LoginService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Controller;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
@@ -75,10 +73,8 @@ class AuthController extends Controller
             'name' => 'required|string|min:4|max:25',
             'email' => 'required|email|max:50',
             'password' => 'required|string|min:6|max:35',
-            'address' => 'string|max:30|regex:/^[a-zA-Z0-9\s,.]+$/',
+            'address' => 'string|max:30',
             'role' => 'required'
-        ], [
-            'address.regex' => 'The address format is invalid. It should contain only letters, numbers, spaces, and the following characters: , .'
         ]);
         try {
 
