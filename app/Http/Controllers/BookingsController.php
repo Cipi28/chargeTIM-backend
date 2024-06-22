@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Car;
-use App\Models\FavouriteStations;
 use App\Models\Plug;
 use App\Models\Station;
 use App\Models\User;
@@ -118,7 +117,6 @@ class BookingsController extends Controller
         $bookings = Booking::where('plug_id', $request->plugId)->get()->unique();
         $conflictingBookings = [];
         foreach ($bookings as $booking) {
-            $bookingStartDate = new \DateTime($booking->start_time);
             if ($booking->start_time <= $newStartDate && $booking->end_time >= $newStartDate) {
                 $conflictingBookings[] = $booking;
                 continue;

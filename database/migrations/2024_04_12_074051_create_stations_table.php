@@ -29,7 +29,7 @@ class CreateStationsTable extends Migration
             $table->integer('rating_count')->default(0);
             $table->boolean('is_public')->default(false);
             $table->integer('user_id')->nullable();
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
             $table->softDeletes();
         });

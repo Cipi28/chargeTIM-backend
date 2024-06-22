@@ -20,7 +20,8 @@ class CreateCarsTable extends Migration
             $table->integer('user_id');
             $table->longText('image');
             $table->string('name');
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

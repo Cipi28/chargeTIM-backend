@@ -32,8 +32,6 @@ class FavouriteStationsController extends Controller
                 $station->owner_mail = $owner->email ?? null;
             }
 
-
-
             return $station;
         });
 

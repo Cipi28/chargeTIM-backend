@@ -222,6 +222,12 @@ class StationsController extends Controller
             $plug->delete();
         }
 
+        //delete all booking relate to the station
+        $bookings = Booking::where('station_id', $id)->get();
+        foreach ($bookings as $booking) {
+            $booking->delete();
+        }
+
         $car = Station::where('id', $id)->first();
         $car->delete();
 

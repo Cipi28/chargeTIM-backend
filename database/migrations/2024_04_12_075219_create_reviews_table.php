@@ -21,10 +21,9 @@ class CreateReviewsTable extends Migration
             $table->longText('reviewer_photo')->nullable();
             $table->boolean('is_public_reviewer')->default(false);
             $table->integer('station_id');
-            $table->foreign('station_id')->references('id')->on('stations');
+            $table->foreign('station_id')->references('id')->on('stations')->onDelete('cascade');
             $table->integer('user_id')->nullable();
-            $table->foreign('user_id')->references('id')->on('stations');
-            $table->dateTime('published_at')->nullable();
+            $table->foreign('user_id')->references('id')->on('stations')->onDelete('cascade');
             $table->timestamps();
             $table->softDeletes();
         });

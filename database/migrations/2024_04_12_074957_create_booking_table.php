@@ -20,16 +20,16 @@ class CreateBookingTable extends Migration
             $table->integer('status')->default(0);
 
             $table->integer('user_id');
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
             $table->integer('car_id');
-            $table->foreign('car_id')->references('id')->on('cars');
+            $table->foreign('car_id')->references('id')->on('cars')->onDelete('cascade');
 
             $table->integer('station_id');
-            $table->foreign('station_id')->references('id')->on('stations');
+            $table->foreign('station_id')->references('id')->on('stations')->onDelete('cascade');
 
             $table->integer('plug_id');
-            $table->foreign('plug_id')->references('id')->on('plugs');
+            $table->foreign('plug_id')->references('id')->on('plugs')->onDelete('cascade');
             $table->softDeletes();
             $table->timestamps();
         });

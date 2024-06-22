@@ -16,9 +16,9 @@ class CreateFavouriteStationsTable extends Migration
         Schema::create('favourite_stations', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id')->nullable();
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->integer('station_id')->nullable();
-            $table->foreign('station_id')->references('id')->on('stations');
+            $table->foreign('station_id')->references('id')->on('stations')->onDelete('cascade');
             $table->softDeletes();
             $table->timestamps();
         });

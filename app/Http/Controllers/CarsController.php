@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Booking;
 use App\Models\Car;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -59,6 +60,11 @@ class CarsController extends Controller
     {
         $car = Car::where('id', $id)->first();
         $car->delete();
+
+        $bookings = Booking::where('car_id', $id)->get();
+        foreach ($bookings as $booking) {
+            $booking->delete();
+        }
 
         $response_data['data'] = $car;
         return response()->json($response_data);
